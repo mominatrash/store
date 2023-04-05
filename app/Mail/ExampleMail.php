@@ -20,6 +20,7 @@ class ExampleMail extends Mailable
      public $random;
 
 
+
     public function __construct($random)
     {
         $this->random = $random;

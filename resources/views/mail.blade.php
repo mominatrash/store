@@ -6,6 +6,7 @@
     <title>Document</title>
 </head>
 <body>
+
  <h1> verification code {{$random}} </h1>
 </body>
 </html>

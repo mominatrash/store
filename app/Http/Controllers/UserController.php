@@ -15,6 +15,7 @@ class UserController extends Controller
         $usere = User::where('email',$request->email)->first();
         $userp = User::where('phone',$request->phone)->first();
         if($usere){
+            
 
             $randomCode = rand(1000,9999);
 

@@ -10,44 +10,39 @@ use illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function register(Request $request){
+    public function login(Request $request){
+
+
 
         $usere = User::where('email',$request->email)->first();
         $userp = User::where('phone',$request->phone)->first();
+        $randomCode = rand(1000,9999);
+
+        if($request->mohammed == 1){
+            $m = 'true';
+        }
+
+        return $m;
+
+
+        if(isset($m)){
+            return 'true';
+        }else{
+            return 'false';
+        }
+
+
         if($usere){
-            
 
-            $randomCode = rand(1000,9999);
-
-            //$user = User::where('email', $request->email)->first();
-            $usere->email_code = $randomCode;
-            $usere->save();
+            return '1';
 
         }elseif($userp){
 
-            // $randomCode = rand(1000,9999);
-            // $usere->phone_code = $randomCode;
-            // $usere->save();
-
-        }
-
-        elseif($request->email){
-
-            $reg = new User();
-
-            $reg->email = $request->email;
-            $reg->save();
-
-            $recipient = 'moamennew@gmail.com';
-            Mail::to($recipient)->send(new ExampleMail());
-
+            return '2';
         }else{
-
-            $reg = new User();
-
-            $reg->phone = $request->phone;
-            $reg->save();
+            return '0';
         }
+
 
 
     }
@@ -57,7 +52,11 @@ class UserController extends Controller
         $random = rand(1111,9999);
 
 
-        $recipient = 'moamennew@gmail.com';
+       // $recipient = 'gonegamer11@gmail.com';
+          $recipient = 'moamennew@gmail.com';
+       // $recipient = 'obaatrash1@gmail.com';
+
+
         Mail::to($recipient)->send(new ExampleMail($random));
     }
 }

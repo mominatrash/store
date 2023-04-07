@@ -31,3 +31,4 @@ Route::get('games', [GameController::class, 'games']);
 Route::post('game_id', [GameController::class, 'game_id']);
 
 Route::get('send', [UserController::class, 'send']);
+Route::post('login', [UserController::class, 'login']);

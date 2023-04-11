@@ -7,6 +7,6 @@
 </head>
 <body>
 
- <h1> يا خنيث </h1>
+ <h1> {{$random}} </h1>
 </body>
 </html>

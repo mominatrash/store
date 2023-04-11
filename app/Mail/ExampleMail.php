@@ -33,7 +33,7 @@ class ExampleMail extends Mailable
      */
     public function build()
     {
-        return $this->from('momenstore@gmail.com', 'MomenStore')
+        return $this->from('momenstore@gmail.com', 'TrickshotStore')
                     ->subject('Verification Code')
                     ->view('mail');
     }

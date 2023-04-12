@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
+use App\Models\Game;
 use App\Models\User;
 use App\Mail\ExampleMail;
+use App\Models\Favourite;
 use illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
@@ -23,9 +27,12 @@ class UserController extends Controller
                 // $usere->phone_code=$ran;
                  $usere->save();
                 //code sent
+                $usere ['token'] = $usere->createToken('accessToken')->accessToken;
+
                 return response()->json([
                     'code'=>200,
                     'message'=>'Phone and Email',
+                    'data' => $usere,
                 ]);
 
             }
@@ -93,12 +100,13 @@ class UserController extends Controller
 
                 User::where('phone_code', $request->phone_code)->update(['phone_code' => null]);
 
-                $token ['token'] = $user->createToken('accessToken')->accessToken;
+                $user ['token'] = $user->createToken('accessToken')->accessToken;
 
                 return response()->json([
                     'message' => 'phone verified successfully',
                     'code' => 200,
-                    'data' => $user
+                    'data' => $user,
+
 
                 ]);
 
@@ -150,6 +158,112 @@ class UserController extends Controller
 
      }
     }
+
+    public function add_fav(Request $request){
+
+
+        $isfav = Favourite::where('user_id', Auth::guard('api')->user()->id)->where('game_id', $request->game_id)->first();
+        //$game = Game::where('user_id',Auth::guard('api')->user()->id)->where('game_id', $request->game_id)->first(['name']);
+        if($isfav){
+            $isfav->delete();
+
+            return response([
+                'status' => true,
+                'message' => 'Game ' . $request->game_id . ' has been removed from favourites',
+            ]);
+
+         } else{
+
+        // if($request->game_id == Favourite::where('user_id', Auth::guard('api')->user()->id));
+
+        $fv = new Favourite();
+        $fv->user_id = Auth::guard('api')->user()->id;
+        $fv->game_id = $request->game_id;
+        $fv->save();
+
+        return response()->json([
+            'message' => 'game added to favourites successfully',
+            'code' => 200,
+            'game' => $fv,
+        ]);
+    }
+
+
+
+    }
+
+    public function favouriteGames(){
+
+        $fg = Favourite::where('user_id', Auth::guard('api')->user()->id)->get();
+
+        $favs = [];
+        foreach ($fg as $item) {
+            $fav = Game::where('id', $item->game_id)->first(['name']);
+            $favs[] = $fav;
+        }
+
+
+        return response()->json([
+            'message' => 'data fetched successfully',
+            'code' => 200,
+            'game' => $favs,
+        ]);
+
+    }
+
+    public function addToCart(Request $request){
+
+
+        $iscart = Cart::where('user_id', Auth::guard('api')->user()->id)->where('game_id', $request->game_id)->first();
+        //$game = Game::where('user_id',Auth::guard('api')->user()->id)->where('game_id', $request->game_id)->first(['name']);
+        if($iscart){
+            $iscart->delete();
+
+            return response([
+                'status' => true,
+                'message' => 'Game ' . $request->game_id . ' has been removed from cart',
+            ]);
+
+         } else{
+
+        // if($request->game_id == Favourite::where('user_id', Auth::guard('api')->user()->id));
+
+        $cart = new Cart();
+        $cart->user_id = Auth::guard('api')->user()->id;
+        $cart->game_id = $request->game_id;
+        $cart->save();
+
+        return response()->json([
+            'message' => 'game' . $request->game_id . ' added to cart successfully',
+            'code' => 200,
+        ]);
+    }
+
+
+
+    }
+
+    public function cartGames(){
+
+        $c = Cart::where('user_id', Auth::guard('api')->user()->id)->get();
+
+        $carts = [];
+        foreach ($c as $item) {
+            $cart = Game::where('id', $item->game_id)->first(['name']);
+            $carts[] = $cart;
+        }
+
+
+        return response()->json([
+            'message' => 'data fetched successfully',
+            'code' => 200,
+            'game' => $carts,
+        ]);
+
+    }
+
+
+
 }
 
 

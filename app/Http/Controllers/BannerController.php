@@ -17,4 +17,16 @@ class BannerController extends Controller
             'data' => $banner
         ]);
     }
+
+
+    public function bannerC(Request $request){
+
+        $bannerC = Banner::where('id', $request->id)->first();
+
+        return response()->json([
+            'message' => 'data fetched successfully',
+            'code' => 200,
+            'data' => $bannerC
+        ]);
+    }
 }

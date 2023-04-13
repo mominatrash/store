@@ -262,6 +262,33 @@ class UserController extends Controller
 
     }
 
+    public function pfp(Request $request){
+
+
+        if (!$request->hasFile('file')) {
+            return response()->json([
+                'message' => 'No file uploaded',
+                'code' => 400
+            ]);
+        }
+
+        $file = $request->file('file');
+        $filename = $file->getClientOriginalName();
+        $path = $file->store('apiDocs');
+        $pfp = new User();
+        $pfp->pfp = $path;
+        $pfp->save();
+
+        return response()->json([
+            'message' => 'data fetched successfully',
+            'code' => 200,
+            'Profile picture' => $pfp
+        ]);
+    }
+
+
+
+
 
 
 }

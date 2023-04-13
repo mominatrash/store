@@ -31,12 +31,14 @@ Route::get('banner', [BannerController::class, 'banner']);
 Route::post('bannerC', [BannerController::class, 'bannerC']);
 Route::get('games', [GameController::class, 'games']);
 Route::post('game_id', [GameController::class, 'game_id']);
+Route::post('search', [GameController::class, 'search']);
 
 Route::get('send', [UserController::class, 'send']);
 Route::post('login', [UserController::class, 'login']);
 Route::post('verify', [UserController::class, 'verify']);
 Route::get('favouriteGames', [UserController::class, 'favouriteGames']);
 Route::get('cartGames', [UserController::class, 'cartGames']);
+Route::post('pfp', [UserController::class, 'pfp']);
 
 
 
@@ -49,4 +51,4 @@ Route::post('addToCart', [UserController::class, 'addToCart']);
 
 
 
-Route::post('packages', [GameController::class, 'packages']);
+Route::post('packages', [GameController::class, '`packages']);

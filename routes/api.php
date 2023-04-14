@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BannerController;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\GamesCountryController;
 use App\Http\Controllers\SoonController;
@@ -51,4 +52,9 @@ Route::post('addToCart', [UserController::class, 'addToCart']);
 
 
 
-Route::post('packages', [GameController::class, '`packages']);
+Route::post('packages', [GameController::class, 'packages']);
+
+
+Route::get('currency', [CurrencyController::class, 'currency']);
+
+

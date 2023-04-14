@@ -234,7 +234,7 @@ class UserController extends Controller
         $cart->save();
 
         return response()->json([
-            'message' => 'game' . $request->game_id . ' added to cart successfully',
+            'message' => 'Game ' . $request->game_id . ' added to cart successfully',
             'code' => 200,
         ]);
     }
@@ -249,7 +249,7 @@ class UserController extends Controller
 
         $carts = [];
         foreach ($c as $item) {
-            $cart = Game::where('id', $item->game_id)->first(['name']);
+            $cart = Game::where('id', $item->game_id)->first(['name','id']);
             $carts[] = $cart;
         }
 
@@ -275,14 +275,14 @@ class UserController extends Controller
         $file = $request->file('file');
         $filename = $file->getClientOriginalName();
         $path = $file->store('apiDocs');
-        $pfp = new User();
+        $pfp = User::where('id', Auth::guard('api')->user()->id)->first();
         $pfp->pfp = $path;
         $pfp->save();
 
         return response()->json([
             'message' => 'data fetched successfully',
             'code' => 200,
-            'Profile picture' => $pfp
+            'Profile picture' => $pfp,$filename
         ]);
     }
 

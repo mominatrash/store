@@ -13,7 +13,8 @@ class Game extends Model
     protected $guarded = [];
     public $timestamps = false;
 
-    protected $appends = ['games_countries'];
+    protected $appends = ['games_countries','reviews'];
+
 
     public function getGamesCountriesAttribute()
     {
@@ -26,5 +27,18 @@ class Game extends Model
 
         return $gc;
     }
+
+
+    public function getReviewsAttribute()
+
+    {
+
+
+    $rev = Review::where('game_id', $this->id)->get(['name','rating','comment']);
+    return $rev;
+
+    }
+
+
 }
 

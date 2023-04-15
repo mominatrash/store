@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BannerController;
+use App\Http\Controllers\CodeController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\GamesCountryController;
@@ -57,4 +58,11 @@ Route::post('packages', [GameController::class, 'packages']);
 
 Route::get('currency', [CurrencyController::class, 'currency']);
 
+
+
+
+
+
+Route::post('generate', [CodeController::class, 'generate']);
+Route::post('purchase', [UserController::class, 'purchase']);
 

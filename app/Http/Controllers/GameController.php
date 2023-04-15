@@ -48,6 +48,13 @@ class GameController extends Controller
 
     public function packages(Request $request){
 
+
+        // Join Example
+        // $s = Package::select('packages.*', 'games.id')
+        //               ->join('games', 'packages.game_id', '=', 'games.id')->get();
+
+
+
         $package = Package::where('game_id',$request->game_id)->where('country_id', $request->country_id)->get(['quantity','name']);
         $game = Game::where('id', $request->game_id)->first('name');
         $country = Country::where('id', $request->country_id)->first('name');

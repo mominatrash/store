@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Code;
 use App\Models\Game;
 use App\Models\User;
+use App\Mail\CodeMail;
 use App\Mail\ExampleMail;
 use App\Models\Favourite;
 use illuminate\Support\Str;
@@ -66,11 +68,14 @@ class UserController extends Controller
             $usere->email_code=$ran;
             $usere->save();
 
+            $usere ['token'] = $usere->createToken('accessToken')->accessToken;
+
             $s=$request->email;
             Mail::to ($s)->send(new ExampleMail($ran));
             return response()->json([
                 'code'=>200,
                 'message'=>'Email Login',
+                'data' => $usere
             ]);
 
             }else{
@@ -80,11 +85,14 @@ class UserController extends Controller
                 $user->email_code=$random;
                 // $user->name = $request-> name;
                 $user->save();
+
+                $user ['token'] = $user->createToken('accessToken')->accessToken;
                 $s=$request->email;
             Mail::to ($s)->send(new ExampleMail($random));
             return response()->json([
                 'code'=>200,
                 'message'=>'Email Register',
+                'data' => $user
             ]);
             }
         }
@@ -287,11 +295,30 @@ class UserController extends Controller
     }
 
 
+    public function purchase(Request $request)
+    {
+        $quantity = $request->quantity;
+        $codes = '';
 
+        for ($i = 0; $i < $quantity; $i++) {
+            $code = Code::where('sold', 0)->where('game_id', $request->game_id)->where('package_id', $request->package_id)->first();
+            $code->sold = 1;
+            $code->save();
+            $codes .= $code->code .' || ';
+        }
 
+        $email = Auth::guard('api')->user()->email;
+        $codes = rtrim($codes, ' || '); // Remove the last separator
 
+        Mail::to($email)->send(new CodeMail($codes));
 
+        return response()->json([
+            'message' => 'Codes sent to ' . $email,
+            'code' => 200,
+        ]);
+    }
 }
+
 
 
 

@@ -64,5 +64,8 @@ Route::get('currency', [CurrencyController::class, 'currency']);
 
 
 Route::post('generate', [CodeController::class, 'generate']);
+
 Route::post('purchase', [UserController::class, 'purchase']);
+Route::get('buy_cart', [UserController::class, 'buy_cart']);
+Route::get('total_price', [UserController::class, 'total_price']);
 

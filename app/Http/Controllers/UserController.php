@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Mail\CodeMail;
 use App\Mail\ExampleMail;
 use App\Models\Favourite;
+use App\Models\Game1;
+use App\Models\Order;
 use illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -223,6 +225,7 @@ class UserController extends Controller
 
 
         $iscart = Cart::where('user_id', Auth::guard('api')->user()->id)->where('game_id', $request->game_id)->first();
+
         //$game = Game::where('user_id',Auth::guard('api')->user()->id)->where('game_id', $request->game_id)->first(['name']);
         if($iscart){
             $iscart->delete();
@@ -239,10 +242,14 @@ class UserController extends Controller
         $cart = new Cart();
         $cart->user_id = Auth::guard('api')->user()->id;
         $cart->game_id = $request->game_id;
+        $cart->package_id = $request->package_id;
+        $cart->quantity = $request->quantity;
+        $cp = Game1::where('id', $request->game_id)->value('price');
+        $cart->price = $cp;
         $cart->save();
 
         return response()->json([
-            'message' => 'Game ' . $request->game_id . ' added to cart successfully',
+            'message' => 'Game ' . $request->game_id .'of package id '.$request->package_id. ' added to cart successfully',
             'code' => 200,
         ]);
     }
@@ -253,19 +260,28 @@ class UserController extends Controller
 
     public function cartGames(){
 
-        $c = Cart::where('user_id', Auth::guard('api')->user()->id)->get();
 
-        $carts = [];
+        $c = Cart::where('user_id', Auth::guard('api')->user()->id)->get()->makeHidden(['created_at','updated_at']);
+
+        $total = 0;
+
         foreach ($c as $item) {
-            $cart = Game::where('id', $item->game_id)->first(['name','id']);
-            $carts[] = $cart;
+            $total += $item->quantity * $item->price;
         }
+
+
+        // $carts = [];
+        // foreach ($c as $item) {
+        //     $cart = Game1::where('id', $item->game_id)->first();
+        //     $carts[] = $cart;
+        // }
 
 
         return response()->json([
             'message' => 'data fetched successfully',
             'code' => 200,
-            'game' => $carts,
+            'game' => $c,
+            'total price' => $total
         ]);
 
     }
@@ -299,22 +315,98 @@ class UserController extends Controller
     {
         $quantity = $request->quantity;
         $codes = '';
-
+        // if(isset($request->quantity))
         for ($i = 0; $i < $quantity; $i++) {
             $code = Code::where('sold', 0)->where('game_id', $request->game_id)->where('package_id', $request->package_id)->first();
             $code->sold = 1;
+            $code->user_id = Auth::guard('api')->user()->id;
             $code->save();
+
             $codes .= $code->code .' || ';
-        }
+        // }else{
+        //     $code = Code::where('sold', 0)->where('game_id', $request->game_id)->where('package_id', $request->package_id)->first();
+        //     $code->sold = 1;
+        //     $code->user_id = Auth::guard('api')->user()->id;
+        //     $code->save();
+        // }
 
         $email = Auth::guard('api')->user()->email;
         $codes = rtrim($codes, ' || '); // Remove the last separator
-
+        if(isset($request->quantity)){
         Mail::to($email)->send(new CodeMail($codes));
+        // }else{
+        // Mail::to($email)->send(new CodeMail($code->code));
+        }
+    }
 
         return response()->json([
             'message' => 'Codes sent to ' . $email,
             'code' => 200,
+        ]);
+    }
+
+    public function total_price(){
+
+    $cart = Cart::where('user_id', Auth::guard('api')->user()->id)->get();
+    $total = 0;
+
+    foreach ($cart as $item) {
+        $total += $item->quantity * $item->price;
+    }
+
+    return response()->json([
+        'message' => 'data fetched successfully',
+        'code' => 200,
+        'total_price' => $total
+    ]);
+
+    }
+
+    public function buy_cart()
+    {
+        $cart = Cart::where('user_id', Auth::guard('api')->user()->id)->get();
+
+
+        foreach ($cart as $c) {
+            for ($i = 0; $i < $c->quantity; $i++) {
+                $code = Code::where('game_id', $c->game_id)
+                    ->where('package_id', $c->package_id)
+                    ->where('sold', 0)
+                    ->first();
+
+                if ($code) {
+                    $code->sold = 1;
+                    $code->user_id = Auth::guard('api')->user()->id;
+                    $code->save();
+                    Mail::to(Auth::guard('api')->user()->email)->send(new CodeMail($code->code));
+
+
+                }
+            }
+
+            $c->delete();
+        }
+
+
+
+        return response()->json([
+            'message' => 'Order sent successfully',
+            'code' => 200,
+        ]);
+    }
+
+
+
+
+
+
+    public function my_order(Request $request){
+        $purchase_id = Code::where('user_id', Auth::guard('api')->user()->id )->get();
+
+        return response()->json([
+            'message' => 'Your order is ',
+            'code' => 200,
+            'order' => $purchase_id
         ]);
     }
 }
